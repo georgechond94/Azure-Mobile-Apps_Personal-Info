@@ -19,9 +19,14 @@ namespace uwpstoriesService.Controllers
     [MobileAppController]
     public class UserInfoController : ApiController
     {
+        //Your Twitter Consumer credentials here. Twitter uses OAuth 1.1 so they are necessary.
         const string TwitterConsumerKey = "<YOUR TWITTER CONSUMER KEY HERE>";
         const string TwitterConsumerSecret = "<YOUR TWITTER CONSUMER SECRET HERE>";
 
+        /// <summary>
+        /// Returns the caller's info from the correct provider. The user who invokes it must be authenticated.
+        /// </summary>
+        /// <returns>The users info</returns>
         public async Task<UserInfo> GetUserInfo()
         {
 
@@ -140,6 +145,12 @@ namespace uwpstoriesService.Controllers
             return info;
         }
 
+        /// <summary>
+        /// Returns the access token and the provider the current user is using.
+        /// </summary>
+        /// <param name="provider">The provider e.g. facebook</param>
+        /// <param name="secret">The user's secret when using Twitter</param>
+        /// <returns>The Access Token</returns>
         private string GetAccessToken(out string provider, out string secret)
         {
             var serviceUser = this.User as ClaimsPrincipal;
@@ -166,6 +177,12 @@ namespace uwpstoriesService.Controllers
             return token;
         }
 
+        /// <summary>
+        /// Encodes to HMAC-SHA1 used by Twitter OAuth 1.1 Authentication
+        /// </summary>
+        /// <param name="input">The input string</param>
+        /// <param name="key">The input key</param>
+        /// <returns>The Base64 HMAC-SHA1 encoded string</returns>
         public static string Encode(string input, byte[] key)
         {
             HMACSHA1 myhmacsha1 = new HMACSHA1(key);
@@ -173,13 +190,20 @@ namespace uwpstoriesService.Controllers
             MemoryStream stream = new MemoryStream(byteArray);
             return Convert.ToBase64String(myhmacsha1.ComputeHash(stream));
         }
-
+        /// <summary>
+        /// Returns the Unix Timestamp of the given DateTime
+        /// </summary>
+        /// <param name="dateTime">The DateTime to convert</param>
+        /// <returns>The Unix Timestamp</returns>
         public static long DateTimeToUnixTimestamp(DateTime dateTime)
         {
             return (long) (TimeZoneInfo.ConvertTimeToUtc(dateTime) -
                            new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds;
         }
-
+        /// <summary>
+        /// Generates a random number from 123400 to int.MaxValue
+        /// </summary>
+        /// <returns>A random number as string</returns>
         public static string GenerateNonce()
         {
             return new Random()
